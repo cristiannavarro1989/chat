@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../helpers/mostrar_alerta.dart';
+import '../services/auth_service.dart';
 import '../widgets/button_blue.dart';
 import '../widgets/custom_input.dart';
 import '../widgets/labels.dart';
@@ -54,6 +57,9 @@ class _FormState extends State<_Form> {
 
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(
+      context,
+    );
     return Container(
       margin: EdgeInsets.only(top: 40),
       padding: EdgeInsets.symmetric(horizontal: 50),
@@ -81,10 +87,18 @@ class _FormState extends State<_Form> {
           SizedBox(height: 20),
 
           ButtonBlue(
-            text: 'Ingresar',
-            onPressed: () {
-              print(emailCtrl.text);
-              print(passCtrl.text);
+            text: 'Crear cuenta',
+            enabled: !authService.autenticando,
+            onPressed: () async {
+              FocusScope.of(context).unfocus();
+              final registerOk = await authService.register(nameCtrl.text.trim(), emailCtrl.text.trim(), passCtrl.text.trim());
+              if (registerOk.isEmpty) {
+                //Navegar a la pantalla principal
+                Navigator.pushReplacementNamed(context, 'usuarios');
+              }else {
+                //Mostrar alerta
+                mostrarAlerta(context, 'Error al registrar la cuenta', registerOk);
+              }
             },
           ),
         ],

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../helpers/mostrar_alerta.dart';
+import '../services/auth_service.dart';
 import '../widgets/button_blue.dart';
 import '../widgets/custom_input.dart';
 import '../widgets/labels.dart';
@@ -20,7 +23,7 @@ class LoginPage extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Logo( text: "Messenger",),
+                Logo(text: "Messenger"),
                 _Form(),
                 Labels(route: 'register'),
                 Text(
@@ -53,6 +56,10 @@ class _FormState extends State<_Form> {
 
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(
+      context,
+    );
+
     return Container(
       margin: EdgeInsets.only(top: 40),
       padding: EdgeInsets.symmetric(horizontal: 50),
@@ -75,9 +82,16 @@ class _FormState extends State<_Form> {
 
           ButtonBlue(
             text: 'Ingresar',
-            onPressed: () {
-              print(emailCtrl.text);
-              print(passCtrl.text);
+            enabled: !authService.autenticando,
+            onPressed: () async {
+              FocusScope.of(context).unfocus();
+             final loginOk = await authService.login(emailCtrl.text.trim(), passCtrl.text.trim());
+             if (loginOk) {
+               Navigator.pushReplacementNamed(context, 'usuarios');
+             }else {
+               //Mostrar alerta
+               mostrarAlerta(context, 'Login incorrecto', 'Revise sus credenciales');
+             }
             },
           ),
         ],

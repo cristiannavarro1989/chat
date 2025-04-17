@@ -3,15 +3,16 @@ import 'package:flutter/material.dart';
 
 class ButtonBlue extends StatelessWidget {
   final String text;
+  final bool enabled;
   final Function onPressed;
 
-  const ButtonBlue({super.key, required this.text, required this.onPressed});
+  const ButtonBlue({super.key, required this.text,required this.onPressed, required this.enabled});
 
   @override
   Widget build(BuildContext context) {
     return  ElevatedButton(
-      onPressed: () => onPressed(),
-      style: ButtonStyle(backgroundColor: WidgetStateProperty.all(Colors.blue)),
+      onPressed: enabled ? () => onPressed() : null,
+      style:  ButtonStyle(backgroundColor: WidgetStateProperty.all( enabled ? Colors.blue : Colors.grey.shade300 )),
       child: SizedBox(
         width: double.infinity,
         height: 50,
