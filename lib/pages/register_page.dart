@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../helpers/mostrar_alerta.dart';
 import '../services/auth_service.dart';
+import '../services/socket_service.dart';
 import '../widgets/button_blue.dart';
 import '../widgets/custom_input.dart';
 import '../widgets/labels.dart';
@@ -60,6 +61,7 @@ class _FormState extends State<_Form> {
     final authService = Provider.of<AuthService>(
       context,
     );
+    final socketService = Provider.of<SocketService>(context);
     return Container(
       margin: EdgeInsets.only(top: 40),
       padding: EdgeInsets.symmetric(horizontal: 50),
@@ -94,6 +96,8 @@ class _FormState extends State<_Form> {
               final registerOk = await authService.register(nameCtrl.text.trim(), emailCtrl.text.trim(), passCtrl.text.trim());
               if (registerOk.isEmpty) {
                 //Navegar a la pantalla principal
+
+                socketService.connect();
                 Navigator.pushReplacementNamed(context, 'usuarios');
               }else {
                 //Mostrar alerta

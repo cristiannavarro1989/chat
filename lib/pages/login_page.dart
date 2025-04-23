@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../helpers/mostrar_alerta.dart';
 import '../services/auth_service.dart';
+import '../services/socket_service.dart';
 import '../widgets/button_blue.dart';
 import '../widgets/custom_input.dart';
 import '../widgets/labels.dart';
@@ -56,10 +57,8 @@ class _FormState extends State<_Form> {
 
   @override
   Widget build(BuildContext context) {
-    final authService = Provider.of<AuthService>(
-      context,
-    );
-
+    final authService = Provider.of<AuthService>(context);
+    final socketService = Provider.of<SocketService>(context);
     return Container(
       margin: EdgeInsets.only(top: 40),
       padding: EdgeInsets.symmetric(horizontal: 50),
@@ -85,13 +84,21 @@ class _FormState extends State<_Form> {
             enabled: !authService.autenticando,
             onPressed: () async {
               FocusScope.of(context).unfocus();
-             final loginOk = await authService.login(emailCtrl.text.trim(), passCtrl.text.trim());
-             if (loginOk) {
-               Navigator.pushReplacementNamed(context, 'usuarios');
-             }else {
-               //Mostrar alerta
-               mostrarAlerta(context, 'Login incorrecto', 'Revise sus credenciales');
-             }
+              final loginOk = await authService.login(
+                emailCtrl.text.trim(),
+                passCtrl.text.trim(),
+              );
+              if (loginOk) {
+                socketService.connect();
+                Navigator.pushReplacementNamed(context, 'usuarios');
+              } else {
+                //Mostrar alerta
+                mostrarAlerta(
+                  context,
+                  'Login incorrecto',
+                  'Revise sus credenciales',
+                );
+              }
             },
           ),
         ],

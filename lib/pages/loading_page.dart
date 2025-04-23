@@ -1,10 +1,9 @@
-import 'package:chat/pages/login_page.dart';
-import 'package:chat/pages/usuarios_page.dart';
-import 'package:chat/services/auth_service.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 
+import '../pages/usuarios_page.dart';
+import '../services/auth_service.dart';
+import '../services/socket_service.dart';
 
 class LoadingPage extends StatefulWidget {
   const LoadingPage({super.key});
@@ -24,11 +23,13 @@ class _LoadingPageState extends State<LoadingPage> {
     await Future.delayed(Duration.zero); // Espera un ciclo de eventos
 
     final authService = Provider.of<AuthService>(context, listen: false);
+    final socketService = Provider.of<SocketService>(context, listen: false);
     final isLoggedIn = await authService.isLoggedIn();
 
     if (!mounted) return; // Verifica si el widget todavía está en el árbol
 
     if (isLoggedIn) {
+      socketService.connect();
       Navigator.pushReplacement(
         context,
         PageRouteBuilder(
@@ -43,9 +44,6 @@ class _LoadingPageState extends State<LoadingPage> {
 
   @override
   Widget build(BuildContext context) {
-
-    return const Scaffold(
-      body: Center(child: CircularProgressIndicator()),
-    );
+    return const Scaffold(body: Center(child: CircularProgressIndicator()));
   }
 }
